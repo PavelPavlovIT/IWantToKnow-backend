@@ -1,0 +1,14 @@
+version: '3.4'
+
+services:
+  iwantknownetapi:
+    image: iwantknownetapi
+    build:
+      context: .
+      dockerfile: Dockerfile.debug
+      args:
+        - configuration=Debug
+    ports:
+      - 8080:8080
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development

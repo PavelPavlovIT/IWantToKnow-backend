@@ -1,0 +1,27 @@
+trigger:
+  - prod
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: 'restore'
+      projects: 'IWantToKnowNet.sln'
+      feedsToUse: 'select'
+
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: 'publish'
+      publishWebProjects: true
+      arguments: ' -o out'
+      modifyOutputPath: false
+
+  - task: AzureRmWebAppDeployment@4
+    inputs:
+      ConnectionType: 'AzureRM'
+      azureSubscription: 'IWantToKnowNet-subscription(8aabc0a3-afdf-452e-b1d4-2dd6fa5993f9)'
+      appType: 'webAppLinux'
+      WebAppName: 'IWantToKnowNet-Api'
+      packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'

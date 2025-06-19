@@ -1,0 +1,23 @@
+trigger:
+- prod
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+
+- task: Docker@2
+  inputs:
+    containerRegistry: 'IWantToKnowNetContainerRegistry'
+    repository: 'iwantknownetapi'
+    command: 'build'
+    Dockerfile: 'Dockerfile'
+    tags: 'latest'
+
+- task: Docker@2
+  inputs:
+    containerRegistry: 'IWantToKnowNetContainerRegistry'
+    repository: 'iwantknownetapi'
+    command: 'push'
+    tags: 'latest'
+

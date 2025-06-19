@@ -1,0 +1,15 @@
+trigger:
+- prod
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+stages:
+- template: ./build.yaml
+- template: release.yaml
+  parameters:
+      AdminPassword: $(AdminPassword)
+      AdminTestPassword: $(AdminTestPassword)
+      HostingPlan: $(HostingPlan)
+      ServerName: $(ServerName)
+      WebsiteName: $(WebsiteName) 

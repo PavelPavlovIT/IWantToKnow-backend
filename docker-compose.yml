@@ -1,0 +1,27 @@
+services:
+  iwantknownetapi:
+    image: iwantknownetapi
+    environment:
+      - MSSQL_SA_PASSWORD=Password1
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    depends_on:
+      - iwantknow-net-sqlserver
+
+  iwantknow-net-sqlserver:
+    container_name: iwantknow-net-sqlserver-container
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Passw0rd!
+    ports:
+      - 1433:1433
+
+networks:
+  default:
+    name: nat
+    external: true
+      

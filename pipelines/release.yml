@@ -1,0 +1,46 @@
+parameters:
+    AdminPassword: default
+    AdminTestPassword: default
+    HostingPlan: default
+    ServerName: default
+    WebsiteName: default
+    
+stages:
+- stage: Deploy
+  jobs:
+  - job: Deploy
+    pool:
+      name: Hosted VS2017
+    steps:
+    - task: DownloadPipelineArtifact@2
+      inputs:
+        buildType: 'current'
+        artifactName: 'drop'
+        targetPath: '$(System.ArtifactsDirectory)'
+
+    - task: AzureResourceManagerTemplateDeployment@3
+      inputs:
+        deploymentScope: 'Resource Group'
+        azureResourceManagerConnection: '<SERVICE-CONNECTION>' # REPLACE with your service connection
+        subscriptionId: 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX' # REPLACE with your Subscription ID
+        action: 'Create Or Update Resource Group'
+        resourceGroupName: 'demo-rg'
+        location: 'East US'
+        templateLocation: 'Linked artifact'
+        csmFile: '$(System.ArtifactsDirectory)/**/FullEnvironmentSetupMerged.json'
+        csmParametersFile: '$(System.ArtifactsDirectory)/**/FullEnvironmentSetupMerged.param.json'
+        overrideParameters: >- 
+          -WebsiteName $(WebsiteName) 
+          -PUL_ServerName $(ServerName) 
+          -PUL_DBPassword $(AdminPassword) 
+          -PUL_DBPasswordForTest $(AdminTestPassword) 
+          -PUL_HostingPlanName $(HostingPlan)
+        deploymentMode: 'Incremental'
+    
+    - task: AzureRmWebAppDeployment@4
+      inputs:
+        ConnectionType: 'AzureRM'
+        azureSubscription: '<SERVICE-CONNECTION>' # REPLACE with your service connection
+        appType: 'webApp'
+        WebAppName: $(WebsiteName)
+        packageForLinux: '$(Build.ArtifactStagingDirectory)/**/*.zip'
